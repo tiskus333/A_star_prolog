@@ -5,9 +5,11 @@ start_A_star(InitState, PathCost, N) :-
 
 
 search_A_star(Queue, ClosedSet, PathCost, N, Iter) :-
-	fetch(Node, Queue, ClosedSet, RestQueue),
 	presentn(Queue, N, Iter),
-	continue(Node, RestQueue, ClosedSet, PathCost, N, Iter).
+	read_list(ChosenList,N),
+	fetch_in_order(Queue,ChosenList, TmpQueue),
+	fetch(Node, TmpQueue, ClosedSet, RestQueue),
+        continue(Node, RestQueue, ClosedSet, PathCost, N, Iter).
 
 
 continue(node(State, Action, Parent, Cost, _), _, ClosedSet, path_cost(Path,Cost), _, _) :-
@@ -80,7 +82,7 @@ del([Y | R],X,[Y | R1]) :-
 %added:
 
 presentn(Queue, N, Iternum) :-
-	format("\nDepth ~w: Hello, these are the first N nodes in the queue:\n", [Iternum, N]),
+	format("\nDepth ~w: Hello, these are the first ~w nodes in the queue:\n",[Iternum, N]),
 	printn(Queue, N), nl, nl.
 
 printn(_, 0) :- !.
@@ -105,10 +107,9 @@ read_list(ChosenList,N):-
 	readln(List),
 	process_list(N,0,List,ChosenList).
 
-process_list(_,_,[],[]).
-process_list(N,N,_,[]).
-process_list(N,Iter,['.'|_],[]):-
-	N\=Iter.
+process_list(_,_,[],[]):-!.
+process_list(N,N,_,[]):-!.
+process_list(_,_,['.'|_],[]).
 process_list(N,Iter,[X|RList],[X|ProcessedList]):-
 	X \='.',
 	Iter < N,
@@ -118,7 +119,7 @@ process_list(N,Iter,[X|RList],[X|ProcessedList]):-
 get_element(List,N,Element):-
 	get_n_elem(List,N,1,Element).
 
-get_n_elem([],_,_,[]):-fail.
+get_n_elem([],_,_,_):-fail.
 get_n_elem([Elem|_],N,N,Elem).
 get_n_elem([_|RList], N,Iter,Elem):-
 	Iter < N,
@@ -131,4 +132,3 @@ fetch_in_order([],_,[]).
 fetch_in_order(Queue,[X|OrderList],[Element|NewOrder]):-
 	get_element(Queue,X,Element),
 	fetch_in_order(Queue,OrderList,NewOrder).
-
