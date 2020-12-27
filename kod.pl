@@ -99,3 +99,36 @@ ask(Data) :-
 
 valid(yes).
 valid(no).
+
+
+read_list(ChosenList,N):-
+	readln(List),
+	process_list(N,0,List,ChosenList).
+
+process_list(_,_,[],[]).
+process_list(N,N,_,[]).
+process_list(N,Iter,['.'|_],[]):-
+	N\=Iter.
+process_list(N,Iter,[X|RList],[X|ProcessedList]):-
+	X \='.',
+	Iter < N,
+	NewIter is Iter + 1,
+	process_list(N,NewIter,RList,ProcessedList).
+
+get_element(List,N,Element):-
+	get_n_elem(List,N,1,Element).
+
+get_n_elem([],_,_,[]):-fail.
+get_n_elem([Elem|_],N,N,Elem).
+get_n_elem([_|RList], N,Iter,Elem):-
+	Iter < N,
+	NewIter is Iter+1,
+	get_n_elem(RList,N,NewIter,Elem).
+
+
+fetch_in_order(_,[],[]).
+fetch_in_order([],_,[]).
+fetch_in_order(Queue,[X|OrderList],[Element|NewOrder]):-
+	get_element(Queue,X,Element),
+	fetch_in_order(Queue,OrderList,NewOrder).
+
